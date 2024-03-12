@@ -14,3 +14,7 @@ build = ["sh", "-c", "go build main.go"]
 run = ["sh", "-c", "./main"]
 ignorePorts = false
 deploymentTarget = "gce"
+
+[[ports]]
+localPort = 5001
+externalPort = 80
