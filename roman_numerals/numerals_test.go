@@ -15,8 +15,8 @@ func TestRomanNumerals(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.Description, func(t *testing.T) {
-			got := ConvertToRoman(1)
-			want := "I"
+			got := ConvertToRoman(test.Arabic)
+			want := test.Want
 
 			if got != want {
 				t.Errorf("got %q, want %q", got, want)
