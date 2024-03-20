@@ -25,7 +25,8 @@ var allRomanNumberals = RomanNumerals{
 	{1, "I"},
 }
 
-func (r RomanNumerals) ValueOf(symbol string) int {
+func (r RomanNumerals) ValueOf(symbols ...byte) int {
+	symbol := string(symbols)
 	for _, s := range r {
 		if s.Symbol == symbol {
 			return s.Value
@@ -48,28 +49,41 @@ func ConvertToRoman(arabic int) string {
 	return result.String()
 }
 
-func ConvertToArabic(roman string) int {
-	total := 0
+func ConvertToArabic(roman string) (total int) {
+	for _, symbols := range windowedRoman(roman).Symbols() {
+		total += allRomanNumberals.ValueOf(symbols...)
+	}
 
-	for i := 0; i < len(roman); i++ {
-		symbol := roman[i]
+	return
+}
 
-		if i+1 < len(roman) && symbol == 'I' {
-			nextSymbol := roman[i+1]
-
-			potentialNumber := string([]byte{symbol, nextSymbol})
-
-			value := allRomanNumberals.ValueOf(potentialNumber)
-
-			if value != 0 {
-				total += value
-				i++
-			} else {
-				total++
-			}
-		} else {
-			total++
+func (r RomanNumerals) Exists(symbols ...byte) bool {
+	symbol := string(symbols)
+	for _, s := range r {
+		if s.Symbol == symbol {
+			return true
 		}
 	}
-	return total
+	return false
+}
+
+type windowedRoman string
+
+func (w windowedRoman) Symbols() (symbols [][]byte) {
+	for i := 0; i < len(w); i++ {
+		symbol := w[i]
+		notAtEnd := i+1 < len(w)
+
+		if notAtEnd && isSubctrative(symbol) && allRomanNumberals.Exists(symbol, w[i+1]) {
+			symbols = append(symbols, []byte{symbol, w[i+1]})
+			i++
+		} else {
+			symbols = append(symbols, []byte{symbol})
+		}
+	}
+	return
+}
+
+func isSubctrative(symbol uint8) bool {
+	return symbol == 'I' || symbol == 'X' || symbol == 'C'
 }
