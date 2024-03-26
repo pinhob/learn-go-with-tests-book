@@ -7,71 +7,63 @@ import (
 	"time"
 )
 
-// func TestSecondHandAt30Seconds(t *testing.T) {
-// 	tm := time.Date(1337, time.January, 1, 0, 0, 30, 0, time.UTC)
-
-// 	want := Point{X: 150, Y: 150 + 90}
-// 	got := SecondHand(os.Stdout, tm)
-
-// 	if got != want {
-// 		t.Errorf("Got %v, wanted %v", got, want)
-// 	}
-// }
-
-func TestSVGWriterAtMidnight(t *testing.T) {
-	tm := time.Date(1337, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-	b := bytes.Buffer{}
-	SVGWriter(&b, tm)
-
-	svg := Svg{}
-	xml.Unmarshal(b.Bytes(), &svg)
-
-	x2 := "150.000"
-	y2 := "60.000"
-
-	for _, line := range svg.Line {
-		if line.X2 == x2 && line.Y2 == y2 {
-			return
-		}
+func TestSVGWrtiterSecondHand(t *testing.T) {
+	cases := []struct {
+		time time.Time
+		line Line
+	}{
+		{
+			simpleTime(0, 0, 0),
+			Line{150, 150, 150, 60},
+		},
+		{
+			simpleTime(0, 0, 30),
+			Line{150, 150, 150, 240},
+		},
 	}
 
-	t.Errorf("Expected to find the second hand line with x2 of %v and y2 of %v, in the SVG, but didn't", x2, y2)
+	for _, c := range cases {
+		t.Run(testName(c.time), func(t *testing.T) {
+			b := bytes.Buffer{}
+			SVGWriter(&b, c.time)
+
+			svg := SVG{}
+			xml.Unmarshal(b.Bytes(), &svg)
+
+			if !containsLine(c.line, svg.Line) {
+				t.Errorf("Expected to find the second hand line with x2 of %v and y2 of %v, in the SVG, but didn't", c.line, svg.Line)
+			}
+		})
+	}
 }
 
-type Svg struct {
+type SVG struct {
 	XMLName xml.Name `xml:"svg"`
-	Text    string   `xml:",chardata"`
 	Xmlns   string   `xml:"xmlns,attr"`
 	Width   string   `xml:"width,attr"`
 	Height  string   `xml:"height,attr"`
 	ViewBox string   `xml:"viewBox,attr"`
-
-	Version string `xml:"version,attr"`
-	Circle  struct {
-		Text  string `xml:",chardata"`
-		Cx    string `xml:"cx,attr"`
-		Cy    string `xml:"cy,attr"`
-		R     string `xml:"r,attr"`
-		Style string `xml:"style,attr"`
-	} `xml:"circle"`
-	Line []struct {
-		Text  string `xml:",chardata"`
-		X1    string `xml:"x1,attr"`
-		Y1    string `xml:"y1,attr"`
-		X2    string `xml:"x2,attr"`
-		Y2    string `xml:"y2,attr"`
-		Style string `xml:"style,attr"`
-	} `xml:"line"`
+	Version string   `xml:"version,attr"`
+	Circle  Circle   `xml:"circle"`
+	Line    []Line   `xml:"line"`
+}
+type Circle struct {
+	Cx float64 `xml:"cx,attr"`
+	Cy float64 `xml:"cy,attr"`
+	R  float64 `xml:"r,attr"`
+}
+type Line struct {
+	X1 float64 `xml:"x1,attr"`
+	Y1 float64 `xml:"y1,attr"`
+	X2 float64 `xml:"x2,attr"`
+	Y2 float64 `xml:"y2,attr"`
 }
 
-// func TestSecondHandAtMidnight(t *testing.T) {
-// 	tm := time.Date(1337, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-// 	want := Point{X: 150, Y: 150 - 90}
-// 	got := SecondHand(tm)
-
-// 	if got != want {
-// 		t.Errorf("Got %v, wanted %v", got, want)
-// 	}
-// }
+func containsLine(l Line, ls []Line) bool {
+	for _, line := range ls {
+		if line == l {
+			return true
+		}
+	}
+	return false
+}
