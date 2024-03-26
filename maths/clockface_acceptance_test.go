@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func TestSVGWrtiterSecondHand(t *testing.T) {
+func TestSVGWriterSecondHand(t *testing.T) {
 	cases := []struct {
 		time time.Time
 		line Line
@@ -36,6 +36,36 @@ func TestSVGWrtiterSecondHand(t *testing.T) {
 		})
 	}
 }
+
+// func TestSVGWriterMinuteHand(t *testing.T) {
+// 	cases := []struct {
+// 		time time.Time
+// 		line Line
+// 	}{
+// 		{
+// 			simpleTime(0, 0, 0),
+// 			Line{150, 150, 150, 70},
+// 		},
+// 		// {
+// 		// 	simpleTime(0, 0, 30),
+// 		// 	Line{150, 150, 150, 240},
+// 		// },
+// 	}
+
+// 	for _, c := range cases {
+// 		t.Run(testName(c.time), func(t *testing.T) {
+// 			b := bytes.Buffer{}
+// 			SVGWriter(&b, c.time)
+
+// 			svg := SVG{}
+// 			xml.Unmarshal(b.Bytes(), &svg)
+
+// 			if !containsLine(c.line, svg.Line) {
+// 				t.Errorf("Expected to find the minute hand line with x2 of %v and y2 of %v, in the SVG, but didn't", c.line, svg.Line)
+// 			}
+// 		})
+// 	}
+// }
 
 type SVG struct {
 	XMLName xml.Name `xml:"svg"`
