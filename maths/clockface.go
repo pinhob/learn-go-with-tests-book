@@ -14,6 +14,7 @@ type Point struct {
 
 const (
 	secondHandLength = 90
+	minuteHandLength = 80
 	clockCentreX     = 150
 	clockCentryY     = 150
 )
@@ -22,16 +23,25 @@ func SVGWriter(w io.Writer, t time.Time) {
 	io.WriteString(w, svgStart)
 	io.WriteString(w, bezel)
 	SecondHand(w, t)
+	MinuteHand(w, t)
 	io.WriteString(w, svgEnd)
 
 }
 
 func SecondHand(w io.Writer, t time.Time) {
-	p := SecondHandPoint(t)
-	p = Point{p.X * secondHandLength, p.Y * secondHandLength} // scale
-	p = Point{p.X, -p.Y}                                      // flip
-	p = Point{p.X + clockCentreX, p.Y + clockCentryY}         // translate
+	p := makeHand(SecondHandPoint(t), secondHandLength)
 	fmt.Fprintf(w, `<line x1="150" y1="150" x2="%.3f" y2="%.3f" style="fill:none;stroke:#f00;stroke-width:3px;"/>`, p.X, p.Y)
+}
+
+func MinuteHand(w io.Writer, t time.Time) {
+	p := makeHand(minuteHandPoint(t), minuteHandLength)
+	fmt.Fprintf(w, `<line x1="150" y1="150" x2="%.3f" y2="%.3f" style="fill:none;stroke:#000;stroke-width:3px;"/>`, p.X, p.Y)
+}
+
+func makeHand(p Point, length float64) Point {
+	p = Point{p.X * length, p.Y * length}                // scale
+	p = Point{p.X, -p.Y}                                 // flip
+	return Point{p.X + clockCentreX, p.Y + clockCentryY} // translate
 }
 
 func SecondHandPoint(t time.Time) Point {
