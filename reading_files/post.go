@@ -1,27 +1,23 @@
 package blogposts
 
-import "io/fs"
+import (
+	"bufio"
+	"io"
+)
 
 type Post struct {
-	Title string
+	Title       string
+	Description string
 }
 
-func NewPostsFromFS(fileSystem fs.FS) ([]Post, error) {
-	dir, err := fs.ReadDir(fileSystem, ".")
+func newPost(postFile io.Reader) (Post, error) {
+	scanner := bufio.NewScanner(postFile)
 
-	if err != nil {
-		return nil, err
-	}
+	scanner.Scan()
+	titleLine := scanner.Text()
 
-	var posts []Post
+	scanner.Scan()
+	descriptionTitle := scanner.Text()
 
-	for _, f := range dir {
-		post, err := getPost(fileSystem, f.Name())
-		if err != nil {
-			return nil, err
-		}
-
-		posts = append(posts, post)
-	}
-	return posts, nil
+	return Post{Title: titleLine[7:], Description: descriptionTitle[13:]}, nil
 }
