@@ -12,7 +12,7 @@ func TestBadBank(t *testing.T) {
 		{
 			From: "Adil",
 			To:   "Chris",
-			Sum:  100,
+			Sum:  25,
 		}}
 
 	AssertEqual(t, BalanceFor(transactions, "Riya"), 100)
