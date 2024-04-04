@@ -28,7 +28,7 @@ func SumAllTails(numbersToSum ...[]int) []int {
 	return Reduce(numbersToSum, sumTail, []int{})
 }
 
-func Reduce[A any](arr []A, acc func(A, A) A, initialValue A) A {
+func Reduce[A, B any](arr []A, acc func(B, A) B, initialValue B) B {
 	var result = initialValue
 	for _, x := range arr {
 		result = acc(result, x)
