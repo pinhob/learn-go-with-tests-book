@@ -7,6 +7,11 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
+	const dbInitialData = `[
+			{ "Name": "Cleo", "Wins": 10 },
+			{ "Name": "Chris", "Wins": 33 }
+		]`
+
 	t.Run("league from a render", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
 			{ "Name": "Cleo", "Wins": 10 },
@@ -39,11 +44,25 @@ func TestFileSystemStore(t *testing.T) {
 
 		want := 33
 
-		assertScoreEqulas(t, got, want)
+		assertScoreEquals(t, got, want)
+	})
+
+	t.Run("store wins for existing players", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, dbInitialData)
+		defer cleanDatabase()
+
+		store := FileSystemPlayerStore{database}
+
+		store.RecordWin("Chris")
+
+		got := store.GetPlayerScore("Chris")
+		want := 34
+
+		assertScoreEquals(t, got, want)
 	})
 }
 
-func assertScoreEqulas(t testing.TB, got, want int) {
+func assertScoreEquals(t testing.TB, got, want int) {
 	t.Helper()
 
 	if got != want {
