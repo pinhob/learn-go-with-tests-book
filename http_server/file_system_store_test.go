@@ -12,6 +12,19 @@ func TestFileSystemStore(t *testing.T) {
 			{ "Name": "Chris", "Wins": 33 }
 		]`
 
+	t.Run("store wins for new players", func(t *testing.T) {
+		database, cleanDatabase := createTempFile(t, dbInitialData)
+		defer cleanDatabase()
+
+		store := FileSystemPlayerStore{database}
+
+		store.RecordWin("Pepper")
+
+		got := store.GetPlayerScore("Pepper")
+		want := 1
+		assertScoreEquals(t, got, want)
+	})
+
 	t.Run("league from a render", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, `[
 			{ "Name": "Cleo", "Wins": 10 },
