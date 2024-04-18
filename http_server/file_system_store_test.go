@@ -16,7 +16,7 @@ func TestFileSystemStore(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, dbInitialData)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store := NewFileSystemPLayerStore(database)
 
 		store.RecordWin("Pepper")
 
@@ -32,7 +32,7 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store := NewFileSystemPLayerStore(database)
 
 		got := store.GetLeague()
 
@@ -51,7 +51,7 @@ func TestFileSystemStore(t *testing.T) {
 		]`)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store := NewFileSystemPLayerStore(database)
 
 		got := store.GetPlayerScore("Chris")
 
@@ -64,7 +64,7 @@ func TestFileSystemStore(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, dbInitialData)
 		defer cleanDatabase()
 
-		store := FileSystemPlayerStore{database}
+		store := NewFileSystemPLayerStore(database)
 
 		store.RecordWin("Chris")
 
