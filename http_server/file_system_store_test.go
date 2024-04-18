@@ -11,15 +11,17 @@ func TestFileSystemStore(t *testing.T) {
 			{ "Name": "Chris", "Wins": 33 }
 		]`
 
+	t.Run("league sorted", func(t *testing.T) {
+
+	})
+
 	t.Run("store wins for new players", func(t *testing.T) {
 		database, cleanDatabase := createTempFile(t, dbInitialData)
 		defer cleanDatabase()
 
 		store, err := NewFileSystemPLayerStore(database)
 
-		if err != nil {
-			t.Fatalf("didn't expet an error but got one, %v", err)
-		}
+		assertNoError(t, err)
 
 		store.RecordWin("Pepper")
 
@@ -37,10 +39,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := NewFileSystemPLayerStore(database)
 
-		if err != nil {
-			t.Fatalf("didn't expet an error but got one, %v", err)
-		}
-
+		assertNoError(t, err)
 		got := store.GetLeague()
 
 		want := []Player{
@@ -60,10 +59,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := NewFileSystemPLayerStore(database)
 
-		if err != nil {
-			t.Fatalf("didn't expet an error but got one, %v", err)
-		}
-
+		assertNoError(t, err)
 		got := store.GetPlayerScore("Chris")
 
 		want := 33
@@ -77,10 +73,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := NewFileSystemPLayerStore(database)
 
-		if err != nil {
-			t.Fatalf("didn't expet an error but got one, %v", err)
-		}
-
+		assertNoError(t, err)
 		store.RecordWin("Chris")
 
 		got := store.GetPlayerScore("Chris")
@@ -95,9 +88,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		_, err := NewFileSystemPLayerStore(database)
 
-		if err != nil {
-			t.Fatalf("didn't expect error but got one, %v", err)
-		}
+		assertNoError(t, err)
 	})
 }
 
@@ -126,4 +117,11 @@ func createTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	}
 
 	return tmpfile, removeFile
+}
+
+func assertNoError(t testing.TB, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("didn't expect an error but got one, %v", err)
+	}
 }
