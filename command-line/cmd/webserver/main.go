@@ -4,23 +4,17 @@ import (
 	"log"
 	poker "main/command-line"
 	"net/http"
-	"os"
 )
 
 const dbFileName = "gabe.db.json"
 
 func main() {
-	db, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
+	store, close, err := poker.FileSystemPlayerStoreFromFile(dbFileName)
 
 	if err != nil {
-		log.Fatalf("problem opening %s %v", dbFileName, err)
+		log.Fatal(err)
 	}
-
-	store, err := poker.NewFileSystemPLayerStore(db)
-
-	if err != nil {
-		log.Fatalf("didn't expect an error but got one, %v", err)
-	}
+	defer close()
 
 	server := poker.NewPlayerServer(store)
 
