@@ -3,8 +3,10 @@ package poker
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
+	"text/template"
 )
 
 const jsonContentType = "application/json"
@@ -31,9 +33,9 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 	p.store = store
 
 	router := http.NewServeMux()
+	router.Handle("/game", http.HandlerFunc(p.leagueHandler))
 	router.Handle("/league", http.HandlerFunc(p.leagueHandler))
 	router.Handle("/players/", http.HandlerFunc(p.playersHandler))
-	router.Handle("/game", http.HandlerFunc(p.game))
 
 	p.Handler = router
 
@@ -57,7 +59,13 @@ func (p *PlayerServer) playersHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) game(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
+	tmpl, err := template.ParseFiles("game.html")
+	log.Println(tmpl)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("problem loading template %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+	tmpl.Execute(w, nil)
 }
 
 func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
