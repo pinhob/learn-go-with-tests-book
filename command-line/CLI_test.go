@@ -10,6 +10,7 @@ import (
 )
 
 type GameSpy struct {
+	StartCalled  bool
 	StartedWith  int
 	FinishedWith string
 }
@@ -46,6 +47,22 @@ var dummyStdOut = &bytes.Buffer{}
 func TestCLI(t *testing.T) {
 
 	t.Run("it prompts the user to enter the number of players and starts the game", func(t *testing.T) {
+
+		t.Run("it prints an error when a non numeric value is entered and does not start the game", func(t *testing.T) {
+			stdout := &bytes.Buffer{}
+			in := strings.NewReader("Pies\n")
+			game := &GameSpy{}
+
+			cli := poker.NewCLI(in, stdout, game)
+			cli.PlayPoker()
+
+			if game.StartCalled {
+				t.Errorf("game should not have started")
+			}
+
+			assertMessagesSentToUser(t, stdout, poker.PlayerPrompt, poker.BadPlayerInputErrMsg)
+		})
+
 		stdout := &bytes.Buffer{}
 		in := strings.NewReader("7\n")
 		game := &GameSpy{}
@@ -92,4 +109,13 @@ func TestCLI(t *testing.T) {
 			t.Errorf("Expected finish called with 'Cleo but got %q", game.FinishedWith)
 		}
 	})
+}
+
+func assertMessagesSentToUser(t testing.TB, stdout *bytes.Buffer, messages ...string) {
+	t.Helper()
+	want := strings.Join(messages, "")
+	got := stdout.String()
+	if got != want {
+		t.Errorf("got %q sent to stdout but expected %+v", got, messages)
+	}
 }
