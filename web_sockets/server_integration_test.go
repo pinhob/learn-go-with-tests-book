@@ -15,7 +15,7 @@ func TestRecordingWinsAndRetrievingThem(t *testing.T) {
 		t.Fatalf("didn't expected an error but got one, %v", err)
 	}
 
-	server := NewPlayerServer(store)
+	server, _ := NewPlayerServer(store)
 	player := "Pepper"
 
 	server.ServeHTTP(httptest.NewRecorder(), newPostWinRequest(player))

@@ -9,7 +9,7 @@ import (
 
 func TestGame(t *testing.T) {
 	t.Run("GET /game returns 200", func(t *testing.T) {
-		server := NewPlayerServer(&StubPlayerStore{})
+		server, _ := NewPlayerServer(&StubPlayerStore{})
 
 		request := newGameRequest()
 		response := httptest.NewRecorder()
@@ -29,7 +29,7 @@ func TestLeague(t *testing.T) {
 		}
 
 		store := StubPlayerStore{nil, nil, wantedLeague}
-		server := NewPlayerServer(&store)
+		server, _ := NewPlayerServer(&store)
 
 		request := newLeagueRequest()
 		response := httptest.NewRecorder()
@@ -53,7 +53,7 @@ func TestGETPlayers(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := NewPlayerServer(&store)
+	server, _ := NewPlayerServer(&store)
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := newGetScoreRequest("Pepper")
@@ -94,7 +94,7 @@ func TestStoreWins(t *testing.T) {
 		nil,
 		nil,
 	}
-	server := NewPlayerServer(&store)
+	server, _ := NewPlayerServer(&store)
 
 	t.Run("it returns wins on POST", func(t *testing.T) {
 		player := "Pepper"
